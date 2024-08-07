@@ -1,31 +1,96 @@
-import { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import { createContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+const isLocalStorageItemsExists = () => {
+    const authToken = localStorage.getItem('authToken');
+    const userProfile = localStorage.getItem('userProfile');
+    
+    // Return true if both authToken and userProfile are present, false otherwise
+    return authToken !== null && userProfile !== null;
+};
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [loading, setLoading] = useState(true);
+    const [isLoggedIn, setIsLoggedIn] = useState(isLocalStorageItemsExists());
+    // const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState(null);
+    const navigate = useNavigate();
 
-    useEffect(() => {
-        const checkAuth = async () => {
+    const handleLoginSuccess = (authToken, userProfile) => {
+        // Store token and user data in localStorage
+        localStorage.setItem('authToken', authToken);
+        localStorage.setItem('userProfile', JSON.stringify(userProfile));
+
+        // Update application state
+        setUser(userProfile);
+        setIsLoggedIn(true);
+
+        // Redirect to the dashboard
+        navigate('/dashboard');
+    };
+
+    const handleLogoutSuccess = () => {
+        // Remove token and user data in localStorage
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userProfile');
+
+        // Update application state
+        setUser(null);
+        setIsLoggedIn(false);
+
+        // Redirect to home or login page
+        navigate('/');
+    }
+
+    const handleLogout = () => {
+        // Logout if the authToken or userProfile information is tempered
+        if(!isLocalStorageItemsExists()) {
+            return handleLogoutSuccess();
+        }
+        
+        // Proceed further to send logout request to server
+        const logout = async () => {
             try {
-                const response = await axios.get(`${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/check-auth`, {
-                    withCredentials: true
-                });
-                setIsLoggedIn(response.data.loggedIn);
+                // Retrieve the token from local storage
+                const authToken = localStorage.getItem('authToken');
+
+                const response = await axios.post(`${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/auth/logout`, {}, {
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Authorization': `Bearer ${authToken}`
+                                    },
+                                    withCredentials: true,
+                                });
+
+                if (response.status === 200) {
+                    console.log('Logout successfully');
+                } else if (response.status === 401) {
+                    console.log('Unauthorized token, proceeding to logout')
+                } else {
+                    console.error('Logout failed, status:', response.status);
+                }
             } catch (error) {
-                console.error('Failed to check auth:', error);
-            } finally {
-                setLoading(false);
+                console.error('An error occurred:', error);
             }
+
+            handleLogoutSuccess();
         };
 
-        checkAuth();
+        logout();
+        
+    };
+
+    useEffect(() => {
+        // Logout if the user is logged in and authToken or userProfile information is tempered
+        if (isLoggedIn && !isLocalStorageItemsExists()) {
+            handleLogoutSuccess();
+        }
     }, []);
 
     return (
-        <AuthContext.Provider value={{ isLoggedIn, loading }}>
+        <AuthContext.Provider value={{ isLoggedIn, user, handleLoginSuccess, handleLogout }}>
             {children}
         </AuthContext.Provider>
     );

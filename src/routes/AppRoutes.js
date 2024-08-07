@@ -5,6 +5,7 @@ import NotFound from '../pages/NotFound/NotFound';
 import ProtectedRoute from '../components/ProtectedRoute/ProtectedRoute';
 import { AuthProvider } from '../contexts/AuthContext';
 import RedirectIfLoggedIn from '../components/RedirectIfLoggedIn/RedirectIfLoggedIn';
+import AuthCallback from '../callbacks/AuthCallback/AuthCallback';
 
 const AppRoutes = () => {
   return (
@@ -25,6 +26,7 @@ const AppRoutes = () => {
               </ProtectedRoute>
             }
           />
+          <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </AuthProvider>
