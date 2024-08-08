@@ -1,11 +1,11 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Home from '../pages/Home/Home';
-import Dashboard from '../pages/Dashboard/Dashboard';
-import NotFound from '../pages/NotFound/NotFound';
-import ProtectedRoute from '../components/ProtectedRoute/ProtectedRoute';
+import Home from '../pages/Home';
+import Dashboard from '../pages/Dashboard';
+import NotFound from '../pages/NotFound';
 import { AuthProvider } from '../contexts/AuthContext';
-import RedirectIfLoggedIn from '../components/RedirectIfLoggedIn/RedirectIfLoggedIn';
-import AuthCallback from '../callbacks/AuthCallback/AuthCallback';
+import ProtectedRoute from '../components/auth/ProtectedRoute';
+import RedirectIfLoggedIn from '../components/auth/RedirectIfLoggedIn';
+import AuthCallback from '../pages/AuthCallback';
 
 const AppRoutes = () => {
   return (

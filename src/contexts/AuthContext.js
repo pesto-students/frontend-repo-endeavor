@@ -31,6 +31,11 @@ export const AuthProvider = ({ children }) => {
         navigate('/dashboard');
     };
 
+    const handleLogin = () => {
+        // Start authentication process
+        window.location.href = `${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/auth/login/federated/google`;
+    };
+
     const handleLogoutSuccess = () => {
         // Remove token and user data in localStorage
         localStorage.removeItem('authToken');
@@ -90,7 +95,7 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     return (
-        <AuthContext.Provider value={{ isLoggedIn, user, handleLoginSuccess, handleLogout }}>
+        <AuthContext.Provider value={{ isLoggedIn, user, navigate, handleLogin, handleLoginSuccess, handleLogout }}>
             {children}
         </AuthContext.Provider>
     );

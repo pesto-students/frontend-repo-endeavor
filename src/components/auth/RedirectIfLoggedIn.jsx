@@ -1,10 +1,8 @@
 import { useContext, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
 
 const RedirectIfLoggedIn = ({ children }) => {
-    const { isLoggedIn, loading } = useContext(AuthContext);
-    const navigate = useNavigate();
+    const { isLoggedIn, loading, navigate } = useContext(AuthContext);
 
     useEffect(() => {
         if (!loading && isLoggedIn) {

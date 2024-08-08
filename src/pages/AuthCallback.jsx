@@ -1,6 +1,6 @@
 import { useEffect, useContext } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { AuthContext } from '../../contexts/AuthContext';
+import { AuthContext } from '../contexts/AuthContext';
 
 const AuthCallback = () => {
   const { handleLoginSuccess } = useContext(AuthContext);
