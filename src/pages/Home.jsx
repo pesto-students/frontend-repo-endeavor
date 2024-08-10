@@ -9,13 +9,13 @@ const Home = () => {
     const { handleLogin, isLoggedIn } = useContext(AuthContext);
 
     if (isLoggedIn) {
-        return <Navigate to='/signup' />;
+        return <Navigate to='/dashboard' />;
     }
 
     return (
         <>
             <NavBar>
-                <NavMenu user_type={"common"} page={"Home"} />
+                <NavMenu userType={"common"} page={"Home"} />
             </NavBar>
             <h2>In the Home</h2>
             <Button onClickHandler={handleLogin} >Sign in with Google</Button>

@@ -18,7 +18,7 @@ const Dashboard = () => {
     return (
         <>
             <NavBar>
-                <NavMenu user_type="business" page="Dashboard" />
+                <NavMenu userType={user.type} page="Dashboard" />
             </NavBar>
             <h2>In the Dashboard</h2>
         </>

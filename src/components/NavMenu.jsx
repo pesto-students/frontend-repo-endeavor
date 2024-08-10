@@ -3,7 +3,7 @@ import { AuthContext } from '../contexts/AuthContext';
 import Button from './Button';
 import { userTypeToPageMenuOptions } from '../constants/userTypeToPageMenuOptions';
 
-const NavMenu = ({ user_type, page }) => {
+const NavMenu = ({ userType, page }) => {
     const { handleLogout } = useContext(AuthContext);
 
     const menuHandler = {
@@ -27,7 +27,7 @@ const NavMenu = ({ user_type, page }) => {
         },
     };
 
-    const menuOptions = userTypeToPageMenuOptions[user_type]?.[page] || [];
+    const menuOptions = userTypeToPageMenuOptions[userType]?.[page] || [];
 
     const menu = menuOptions.map((menuDetail) => (
         <Button key={menuDetail.name} onClickHandler={menuHandler[menuDetail.name].onClickHandler}>{menuDetail.symbol}</Button>
