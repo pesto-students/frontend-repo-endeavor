@@ -46,7 +46,6 @@ export const AuthProvider = ({ children }) => {
         // Update application state
         setUser(null);
         setIsLoggedIn(false);
-        setLoading(false);
 
         // Redirect to home or login page
         navigate('/');
@@ -86,6 +85,8 @@ export const AuthProvider = ({ children }) => {
 
         handleLogoutSuccess();
 
+        // reset application loading status
+        setLoading(false);
     }
 
     useEffect(() => {

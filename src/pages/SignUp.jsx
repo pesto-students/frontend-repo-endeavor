@@ -7,22 +7,25 @@ import Button from '../components/Button';
 import axios from 'axios';
 
 const SignUp = () => {
-    const { isLoggedIn, user, setUser, loading, setLoading } = useContext(AuthContext);
+    const { isLoggedIn, user, setUser, setLoading } = useContext(AuthContext);
     const [detailsAdded, setDetailsAdded] = useState(false);
 
     if (!isLoggedIn) {
         return <Navigate to='/' />;
     } else {
-        if (user.type && detailsAdded) {
-            return <Navigate to='/dashboard' />;
+        if (detailsAdded) {
+            if (user.type === "consumer") {
+                return <Navigate to='/dashboard' />;
+            } else if (user.type === "business") {
+                return <Navigate to='/detailpage-newentry' />;
+            }
         }
     }
 
     const handleUserUpdateSuccess = (userProfile) => {
         localStorage.setItem('userProfile', JSON.stringify(userProfile));
 
-        // reset application loading status
-        setLoading(false);
+        // set state
         setDetailsAdded(true);
     }
 
@@ -61,6 +64,9 @@ const SignUp = () => {
         } catch (error) {
             console.error('An error occurred:', error);
         }
+
+        // reset application loading status
+        setLoading(false);
     }
 
     return (
@@ -76,11 +82,11 @@ const SignUp = () => {
                 <option value="mumbai">Mumbai</option>
             </select>
             <select id="type" name="type" value={!user.type ? "DEFAULT" : user.type} onChange={(event) => setUser({ ...user, type: event.target.value })} >
-                <option value="DEFAULT" disabled >Choose city ...</option>
+                <option value="DEFAULT" disabled >Choose user type ...</option>
                 <option value="consumer">Consumer</option>
                 <option value="business">Business</option>
             </select>
-            {user.type && <Button onClickHandler={handleUserUpdate}>{user.type == "consumer" ? "submit" : "next"}</Button>}
+            {user.type && <Button onClickHandler={handleUserUpdate}>{user.type === "consumer" ? "submit" : "next"}</Button>}
         </>
     );
 }
