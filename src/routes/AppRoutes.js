@@ -1,10 +1,10 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from '../pages/Home';
+import SignUp from '../pages/SignUp';
 import Dashboard from '../pages/Dashboard';
+import DetailPage from '../pages/DetailPage';
 import NotFound from '../pages/NotFound';
 import { AuthProvider } from '../contexts/AuthContext';
-import ProtectedRoute from '../components/auth/ProtectedRoute';
-import RedirectIfLoggedIn from '../components/auth/RedirectIfLoggedIn';
 import AuthCallback from '../pages/AuthCallback';
 
 const AppRoutes = () => {
@@ -12,20 +12,10 @@ const AppRoutes = () => {
     <Router>
       <AuthProvider>
         <Routes>
-          <Route path="/"
-            element={
-              <RedirectIfLoggedIn>
-                <Home />
-              </RedirectIfLoggedIn>
-            }
-          />
-          <Route path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/" element={ <Home /> } />
+          <Route path="/signup" element={ <SignUp /> } />
+          <Route path="/dashboard" element={ <Dashboard /> } />
+          <Route path="/detailpage" element={ <DetailPage /> } />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

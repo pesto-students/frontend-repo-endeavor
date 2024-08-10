@@ -1,16 +1,28 @@
-import Button from '../components/Button';
 import { useContext } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
+import NavBar from '../components/NavBar';
+import NavMenu from '../components/NavMenu';
+import { Navigate } from 'react-router-dom';
 
 const Dashboard = () => {
-    const { handleLogout } = useContext(AuthContext);
+    const { isLoggedIn, user } = useContext(AuthContext);
+
+    if (!isLoggedIn) {
+        return <Navigate to='/' />;
+    } else {
+        if (!user.type) {
+            return <Navigate to='/signup' />;
+        }
+    }
 
     return (
         <>
+            <NavBar>
+                <NavMenu user_type="business" page="Dashboard" />
+            </NavBar>
             <h2>In the Dashboard</h2>
-            <Button onClickHandler={handleLogout} content="Logout" ></Button>
         </>
-    );
+    );  
 }
 
 export default Dashboard;

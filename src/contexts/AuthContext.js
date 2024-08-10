@@ -1,11 +1,11 @@
 import axios from 'axios';
 import { createContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 const isLocalStorageItemsExists = () => {
     const authToken = localStorage.getItem('authToken');
     const userProfile = localStorage.getItem('userProfile');
-    
+
     // Return true if both authToken and userProfile are present, false otherwise
     return authToken !== null && userProfile !== null;
 };
@@ -14,7 +14,7 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(isLocalStorageItemsExists());
-    // const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [user, setUser] = useState(JSON.parse(localStorage.getItem('userProfile')));
     const navigate = useNavigate();
 
@@ -26,12 +26,14 @@ export const AuthProvider = ({ children }) => {
         // Update application state
         setUser(userProfile);
         setIsLoggedIn(true);
+        setLoading(false);
 
         // Redirect to the dashboard
         navigate('/dashboard');
     };
 
     const handleLogin = () => {
+        setLoading(true);
         // Start authentication process
         window.location.href = `${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/auth/login/federated/google`;
     };
@@ -44,17 +46,19 @@ export const AuthProvider = ({ children }) => {
         // Update application state
         setUser(null);
         setIsLoggedIn(false);
+        setLoading(false);
 
         // Redirect to home or login page
         navigate('/');
     }
 
     const handleLogout = () => {
+        setLoading(true);
         // Logout if the authToken or userProfile information is tempered
-        if(!isLocalStorageItemsExists()) {
+        if (!isLocalStorageItemsExists()) {
             return handleLogoutSuccess();
         }
-        
+
         // Proceed further to send logout request to server
         const logout = async () => {
             try {
@@ -62,12 +66,12 @@ export const AuthProvider = ({ children }) => {
                 const authToken = localStorage.getItem('authToken');
 
                 const response = await axios.post(`${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/auth/logout`, {}, {
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        'Authorization': `Bearer ${authToken}`
-                                    },
-                                    withCredentials: true,
-                                });
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    withCredentials: true,
+                });
 
                 if (response.status === 200) {
                     console.log('Logout successfully');
@@ -84,7 +88,7 @@ export const AuthProvider = ({ children }) => {
         };
 
         logout();
-        
+
     };
 
     useEffect(() => {
@@ -95,7 +99,7 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     return (
-        <AuthContext.Provider value={{ isLoggedIn, user, navigate, handleLogin, handleLoginSuccess, handleLogout }}>
+        <AuthContext.Provider value={{ isLoggedIn, user, loading, setLoading, handleLogin, handleLoginSuccess, handleLogout }}>
             {children}
         </AuthContext.Provider>
     );
