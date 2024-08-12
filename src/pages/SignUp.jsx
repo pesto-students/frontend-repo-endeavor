@@ -4,69 +4,38 @@ import NavMenu from '../components/NavMenu';
 import { Navigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 import Button from '../components/Button';
-import axios from 'axios';
+import useHttpRequest from '../hooks/useHttpRequest';
 
 const SignUp = () => {
-    const { isLoggedIn, user, setUser, setLoading } = useContext(AuthContext);
-    const [detailsAdded, setDetailsAdded] = useState(false);
+    const { loggedIn, user, setUser } = useContext(AuthContext);
+    const initialData = { collectionName: "user", query: { email: user.email }, updateFields: { mobile: user.mobile, city: user.city, type: user.type }, projection: { name: 1, mobile: 1, city: 1, email: 1, image: 1, type: 1 } };
+    const initialUrl = `${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/update`;
+    const initialMethod = 'PATCH';
+    const { requestData, setRequestData, makeRequest } = useHttpRequest(initialData, initialUrl, initialMethod);
+    const detailsAdded = JSON.parse(localStorage.getItem('userProfile')).type ? true : false;
 
-    if (!isLoggedIn) {
+    console.log(loggedIn, detailsAdded)
+
+    if (!loggedIn) {
         return <Navigate to='/' />;
     } else {
         if (detailsAdded) {
-            if (user.type === "consumer") {
+            if (requestData.updateFields.type === "consumer") {
                 return <Navigate to='/dashboard' />;
-            } else if (user.type === "business") {
+            } else if (requestData.updateFields.type === "business") {
                 return <Navigate to='/detailpage-newentry' />;
             }
         }
     }
 
-    const handleUserUpdateSuccess = (userProfile) => {
-        localStorage.setItem('userProfile', JSON.stringify(userProfile));
-
-        // set state
-        setDetailsAdded(true);
+    const handleUserUpdateSuccess = (response) => {
+        const updatedUserProfile = response.data.document;
+        localStorage.setItem('userProfile', JSON.stringify(updatedUserProfile));
+        setUser(updatedUserProfile);
     }
 
     const handleUserUpdate = async () => {
-        // set application loading status
-        setLoading(true);
-
-        // Proceed further to send user update request to server
-        try {
-            // Retrieve the token from local storage
-            const authToken = localStorage.getItem('authToken');
-
-            const response = await axios.post(
-                `${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/users/update`,
-                {
-                    email: user.email,
-                    mobile: user.mobile,
-                    city: user.city,
-                    type: user.type,
-                },
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${authToken}`
-                    },
-                    withCredentials: true,
-                }
-            );
-
-            if (response.status === 200) {
-                console.log('User updated successfully', response.data);
-                handleUserUpdateSuccess(response.data.user);
-            } else {
-                console.error('User updation failed, status:', response.status, response.data)
-            }
-        } catch (error) {
-            console.error('An error occurred:', error);
-        }
-
-        // reset application loading status
-        setLoading(false);
+        makeRequest({ customHandleRequestSuccess: handleUserUpdateSuccess });
     }
 
     return (
@@ -75,18 +44,18 @@ const SignUp = () => {
                 <NavMenu userType="common" page="SignUp" />
             </NavBar>
             <h2>In the Sign Up Page</h2>
-            <input id='mobile' type='number' value={!user.mobile ? "" : user.mobile} onChange={(event) => setUser({ ...user, mobile: event.target.value })} placeholder='Enter Mobile' />
-            <select id="city" name="city" value={!user.city ? "DEFAULT" : user.city} onChange={(event) => setUser({ ...user, city: event.target.value })} >
+            <input value={!requestData.updateFields.mobile ? "" : requestData.updateFields.mobile} onChange={(event) => setRequestData({ ...requestData, updateFields: { ...requestData.updateFields, mobile: event.target.value }})} placeholder='Enter Mobile' />
+            <select value={!requestData.updateFields.city ? "DEFAULT" : requestData.updateFields.city} onChange={(event) => setRequestData({ ...requestData, updateFields: { ...requestData.updateFields, city: event.target.value }})} >
                 <option value="DEFAULT" disabled>Choose city ...</option>
                 <option value="delhi">Delhi</option>
                 <option value="mumbai">Mumbai</option>
             </select>
-            <select id="type" name="type" value={!user.type ? "DEFAULT" : user.type} onChange={(event) => setUser({ ...user, type: event.target.value })} >
-                <option value="DEFAULT" disabled >Choose user type ...</option>
+            <select value={!requestData.updateFields.type ? "DEFAULT" : requestData.updateFields.type} onChange={(event) => setRequestData({ ...requestData, updateFields: { ...requestData.updateFields, type: event.target.value }})} >
+                <option value="DEFAULT" disabled>Choose user type ...</option>
                 <option value="consumer">Consumer</option>
                 <option value="business">Business</option>
             </select>
-            {user.type && <Button onClickHandler={handleUserUpdate}>{user.type === "consumer" ? "submit" : "next"}</Button>}
+            {requestData.updateFields.type && <Button onClickHandler={handleUserUpdate}>{requestData.updateFields.type === "consumer" ? "submit" : "next"}</Button>}
         </>
     );
 }

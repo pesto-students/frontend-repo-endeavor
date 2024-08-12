@@ -6,9 +6,9 @@ import NavMenu from "../components/NavMenu";
 import NavBar from "../components/NavBar";
 
 const Home = () => {
-    const { handleLogin, isLoggedIn } = useContext(AuthContext);
+    const { handleLogin, loggedIn } = useContext(AuthContext);
 
-    if (isLoggedIn) {
+    if (loggedIn) {
         return <Navigate to='/dashboard' />;
     }
 
