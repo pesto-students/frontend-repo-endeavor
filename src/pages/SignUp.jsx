@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import NavBar from '../components/NavBar';
 import NavMenu from '../components/NavMenu';
 import { Navigate } from 'react-router-dom';
@@ -14,7 +14,7 @@ const SignUp = () => {
     const { requestData, setRequestData, makeRequest } = useHttpRequest(initialData, initialUrl, initialMethod);
     const detailsAdded = JSON.parse(localStorage.getItem('userProfile')).type ? true : false;
 
-    console.log(loggedIn, detailsAdded)
+    
 
     if (!loggedIn) {
         return <Navigate to='/' />;
