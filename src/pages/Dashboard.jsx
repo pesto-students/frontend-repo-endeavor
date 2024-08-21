@@ -1,44 +1,32 @@
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
+import { ApiContext } from '../contexts/ApiContext';
 import NavBar from '../components/NavBar';
 import NavMenu from '../components/NavMenu';
 import { Navigate, useNavigate } from 'react-router-dom';
-import useHttpRequest from '../hooks/useHttpRequest';
 
 const Dashboard = () => {
     const { loggedIn, user } = useContext(AuthContext);
+    const { makeRequest } = useContext(ApiContext);
+    const initSearchParam = { collectionName: "business", page: 1, limit: 10, filter: user.type === "consumer" ? { city: user.city } : user.type === "business" ? { user_id: user.email } : {}, projection: { name: 1 }, sortBy: { updated_at: -1, created_at: -1 } };
+    const [searchParam, setSearchParam] = useState(initSearchParam);
+    const searchUrl = `${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/search`;
+    const searchMethod = 'POST';
+    const [responseData, setResponseData] = useState(null);
     const navigate = useNavigate();
-    const initialData = { collectionName: "business", page: 1, limit: 10, filter: {}, projection: { name: 1 }, sortBy: { updated_at: -1, created_at: -1 } };
-    const initialUrl = `${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/search`;
-    const initialMethod = 'POST';
-    const { requestData, responseData, setRequestData, makeRequest } = useHttpRequest(initialData, initialUrl, initialMethod);
 
 
     // load default businesses based on user type
     useEffect(() => {
-        if (loggedIn && JSON.stringify(requestData.filter) === '{}') {
-            if (user.type === "consumer") {
-                setRequestData({
-                    ...requestData,
-                    filter: {
-                        ...requestData.filter,
-                        city: user.city
-                    }
-                });
-            } else if (user.type === "business") {
-                setRequestData({
-                    ...requestData,
-                    filter: {
-                        ...requestData.filter,
-                        user_id: user.email
-                    }
-                });
+        makeRequest({ 
+            data: searchParam, 
+            url: searchUrl, 
+            method: searchMethod, 
+            customHandleRequestSuccess: (response) => {
+                setResponseData(response.data);
             }
-        }
-        if (JSON.stringify(requestData.filter) !== '{}') {
-            makeRequest();
-        }
-    }, [requestData]);
+        });
+    }, [searchParam]);
 
     if (!loggedIn) {
         return <Navigate to='/' />;
@@ -50,7 +38,7 @@ const Dashboard = () => {
 
     const businesses = responseData && responseData.documents;
     const businessesSummary = businesses && businesses.map((business) => (
-        <div key={business._id} onClick={() => navigate(`/detailpage/${business._id}`)}>{
+        <div key={business._id} onClick={() => navigate(`/business/${business._id}`)}>{
             Object.keys(business).map((key) => (
                 <p key={key}>{key}: {business[key]}</p>
             ))}

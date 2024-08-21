@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useHttpRequest from '../hooks/useHttpRequest'
 import { AppContext } from './AppContext';
+import { ApiContext } from './ApiContext';
 
 const isLocalStorageItemsExists = () => {
     const authToken = localStorage.getItem('authToken');
@@ -18,10 +18,9 @@ export const AuthProvider = ({ children }) => {
     const { setLoading } = useContext(AppContext);
     const [loggedIn, setLoggedIn] = useState(isLocalStorageItemsExists());
     const [user, setUser] = useState(JSON.parse(localStorage.getItem('userProfile')));
-    const initialLogoutData = {};
-    const initialLogoutUrl = `${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/auth/logout`;
-    const initialLogoutMethod = 'POST';
-    const { makeRequest } = useHttpRequest(initialLogoutData, initialLogoutUrl, initialLogoutMethod);
+    const { makeRequest } = useContext(ApiContext);
+    const logoutUrl = `${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/auth/logout`;
+    const logoutMethod = 'POST';
 
 
     const handleLoginSuccess = (authToken, userProfile) => {
@@ -58,7 +57,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     const handleLogout = async () => {
-        makeRequest({ customHandleRequestSuccess: handleLogoutSuccess });
+        makeRequest({ url: logoutUrl, method: logoutMethod, customHandleRequestSuccess: handleLogoutSuccess });
     }
 
     useEffect(() => {

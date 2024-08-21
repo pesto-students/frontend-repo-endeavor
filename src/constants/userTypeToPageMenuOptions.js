@@ -7,8 +7,7 @@ export const userTypeToPageMenuOptions = {
     },
     business: {
         Dashboard: [menuDetails.add, menuDetails.exit],
-        DetailPageNewEntry: [menuDetails.save, /*menuDetails.back*/],
-        DetailPage: [menuDetails.save, menuDetails.delete, menuDetails.exit],
+        BusinessNewOrEdit: [menuDetails.save, menuDetails.delete, menuDetails.exit],
     },
     common: {
         Home: [],
