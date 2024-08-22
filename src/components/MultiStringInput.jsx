@@ -1,24 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
-const MultiStringInput = ({ onStringsChange, initStrings = [] }) => {
+const MultiStringInput = ({ onStringsChange, strings }) => {
     const [inputValue, setInputValue] = useState('');
-    const [strings, setStrings] = useState(initStrings);
-
-    useEffect(() => {
-        setStrings(initStrings);
-    }, [initStrings]);
 
     const handleInputChange = (event) => {
-        setInputValue(event.target.value);
+        if (event.target.value === ',') {
+            setInputValue('');
+        } else {
+            setInputValue(event.target.value);
+        }
     };
 
     const handleKeyPress = (event) => {
-        if ((event.key === 'Enter' || event.key === ',') && inputValue.trim() !== '' && strings.length < 10) {
+        if ((event.key === 'Enter' || event.key === ',') && inputValue.trim() !== '') {
             event.preventDefault();  // Prevent the default behavior of inserting the comma
             const trimmedInput = inputValue.trim();
             if (!strings.includes(trimmedInput)) {
                 const updatedStrings = [...strings, trimmedInput];
-                setStrings(updatedStrings);
                 setInputValue('');
                 onStringsChange(updatedStrings); // Update parent component
             } else {
@@ -29,7 +27,6 @@ const MultiStringInput = ({ onStringsChange, initStrings = [] }) => {
 
     const handleDelete = (index) => {
         const updatedStrings = strings.filter((_, i) => i !== index);
-        setStrings(updatedStrings);
         onStringsChange(updatedStrings); // Update parent component
     };
 
@@ -59,7 +56,7 @@ const MultiStringInput = ({ onStringsChange, initStrings = [] }) => {
                     </button>
                 </div>
             ))}
-            <input
+            {strings.length < 10 && <input
                 type="text"
                 value={inputValue}
                 onChange={handleInputChange}
@@ -71,7 +68,7 @@ const MultiStringInput = ({ onStringsChange, initStrings = [] }) => {
                     minWidth: '100px'
                 }}
                 placeholder={strings.length < 10 ? 'Add a service...' : ''}
-            />
+            />}
         </div>
     );
 };

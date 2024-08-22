@@ -158,12 +158,12 @@ const BusinessNewOrEdit = ({ edit }) => {
 
                 Integrate the new StringInputComponent
                 <h3>Enter Services:</h3>
-                <MultiStringInput onStringsChange={handleStringsChange} initStrings={businessDetail.service} />
+                <MultiStringInput onStringsChange={handleStringsChange} strings={businessDetail.service} />
 
                 <h3>Upload Business Logo:</h3>
-                <ImageUploader isMultiple={false} onImageSelect={handleLogoSelect} initImages={businessDetail.logo} />
+                <ImageUploader isMultiple={false} onImageSelect={handleLogoSelect} images={businessDetail.logo} />
                 <h3>Upload Gallery Images:</h3>
-                <ImageUploader isMultiple={true} onImageSelect={handleGallerySelect} initImages={businessDetail.gallery} />
+                <ImageUploader isMultiple={true} onImageSelect={handleGallerySelect} images={businessDetail.gallery} />
                 <Button onClickHandler={handleFormSubmission}>{edit ? "Update" : "Submit"}</Button>
                 {edit && <Button onClickHandler={handleDeletion}>DELETE</Button>}
             </div>

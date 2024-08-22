@@ -1,13 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import './ImageUploader.css'; // Import the CSS file
 
-const ImageUploader = ({ isMultiple, onImageSelect, initImages = isMultiple ? [] : null }) => {
-  const [images, setImages] = useState(initImages);
+const ImageUploader = ({ isMultiple, onImageSelect, images }) => {
   const [selectedImage, setSelectedImage] = useState(null);
-
-  useEffect(() => {
-      setImages(initImages);
-  }, [initImages]);
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
@@ -29,10 +24,8 @@ const ImageUploader = ({ isMultiple, onImageSelect, initImages = isMultiple ? []
   const handleRemoveImage = (index) => {
     if (isMultiple) {
       const updatedImages = images.filter((_, i) => i !== index);
-      setImages(updatedImages);
       onImageSelect(updatedImages);
     } else {
-      setImages(null);
       onImageSelect(null);
     }
   };
