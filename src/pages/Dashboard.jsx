@@ -8,9 +8,9 @@ import { Navigate, useNavigate } from 'react-router-dom';
 const Dashboard = () => {
     const { loggedIn, user } = useContext(AuthContext);
     const { makeRequest } = useContext(ApiContext);
-    const initSearchParam = { collectionName: "business", page: 1, limit: 10, filter: user.type === "consumer" ? { city: user.city } : user.type === "business" ? { user_id: user.email } : {}, projection: { name: 1 }, sortBy: { updated_at: -1, created_at: -1 } };
+    const initSearchParam = { page: 1, limit: 10, filter: user.type === "consumer" ? { city: user.city } : user.type === "business" ? { user_id: user.email } : {}, projection: { name: 1 }, sortBy: { updated_at: -1, created_at: -1 } };
     const [searchParam, setSearchParam] = useState(initSearchParam);
-    const searchUrl = `${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/search`;
+    const searchUrl = `${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/business/search`;
     const searchMethod = 'POST';
     const [responseData, setResponseData] = useState(null);
     const navigate = useNavigate();

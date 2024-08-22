@@ -36,8 +36,8 @@ const BusinessNewOrEdit = ({ edit }) => {
 
     useEffect(() => {
         if (edit) {
-            const searchParam = { collectionName: "business", page: 1, limit: 10, filter: { _id }, projection: {}, sortBy: { updated_at: -1, created_at: -1 } };
-            const searchUrl = `${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/search`;
+            const searchParam = { filter: { _id } };
+            const searchUrl = `${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/business/search`;
             const searchMethod = 'POST';
 
             makeRequest({
