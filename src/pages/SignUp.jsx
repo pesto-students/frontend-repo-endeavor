@@ -1,18 +1,14 @@
 import { useContext, useState } from 'react';
-import NavBar from '../components/NavBar';
-import NavMenu from '../components/NavMenu';
 import { Navigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 import { ApiContext } from '../contexts/ApiContext';
-import Button from '../components/Button';
+import Button from '../components/IO/Button';
 
 const SignUp = () => {
     const { loggedIn, user, setUser } = useContext(AuthContext);
     const { makeRequest } = useContext(ApiContext);
     const initUserProfile = { email: user.email, mobile: user.mobile, city: user.city, type: user.type };
     const [userProfile, setUserProfile] = useState(initUserProfile);
-    const updateUrl = `${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/user/update`;
-    const updateMethod = 'PATCH';
     const detailsAdded = JSON.parse(localStorage.getItem('userProfile')).type ? true : false;
 
     
@@ -30,6 +26,8 @@ const SignUp = () => {
     }
 
     const handleUserUpdate = async () => {
+        const updateUrl = `${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/user/update`;
+        const updateMethod = 'PATCH';
         makeRequest({ 
             data: userProfile, 
             url: updateUrl, 
@@ -44,9 +42,6 @@ const SignUp = () => {
 
     return (
         <>
-            <NavBar>
-                <NavMenu userType="common" page="SignUp" />
-            </NavBar>
             <h2>In the Sign Up Page</h2>
             <input value={!userProfile.mobile ? "" : userProfile.mobile} onChange={(event) => setUserProfile({ ...userProfile, mobile: event.target.value })} placeholder='Enter Mobile' />
             <select value={!userProfile.city ? "DEFAULT" : userProfile.city} onChange={(event) => setUserProfile({ ...userProfile, city: event.target.value })} >

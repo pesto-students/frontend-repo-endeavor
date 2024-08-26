@@ -1,32 +1,59 @@
 import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import { ApiContext } from '../contexts/ApiContext';
-import NavBar from '../components/NavBar';
-import NavMenu from '../components/NavMenu';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { AppContext } from '../contexts/AppContext';
+import BusinessSummary from '../components/BusinessSummary/BusinessSummary';
 
 const Dashboard = () => {
-    const { loggedIn, user } = useContext(AuthContext);
+    const { loggedIn, user, handleLogout } = useContext(AuthContext);
     const { makeRequest } = useContext(ApiContext);
-    const initSearchParam = { page: 1, limit: 10, filter: user.type === "consumer" ? { city: user.city } : user.type === "business" ? { user_id: user.email } : {}, projection: { name: 1 }, sortBy: { updated_at: -1, created_at: -1 } };
-    const [searchParam, setSearchParam] = useState(initSearchParam);
-    const searchUrl = `${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/business/search`;
-    const searchMethod = 'POST';
-    const [responseData, setResponseData] = useState(null);
+    const { setCurrentMenuConfig } = useContext(AppContext);
     const navigate = useNavigate();
+    const initSearchParam = { 
+        page: 1, 
+        limit: 10, 
+        filter: user.type === "consumer" ? 
+                    { city: user.city } : 
+                    user.type === "business" ? 
+                        { user_id: user.email } : 
+                        {}, 
+        projection: { name: 1, service: 1, rating: 1 }, 
+        sortBy: { updated_at: -1, created_at: -1 } 
+    };
+    const [searchParam, setSearchParam] = useState(initSearchParam);
+    const [businesses, setBusinesses] = useState([]);
 
-
-    // load default businesses based on user type
     useEffect(() => {
+        const searchUrl = `${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/business/search`;
+        const searchMethod = 'POST';
         makeRequest({ 
             data: searchParam, 
             url: searchUrl, 
             method: searchMethod, 
             customHandleRequestSuccess: (response) => {
-                setResponseData(response.data);
+                const documents = response.data && response.data.documents;
+                if (Array.isArray(documents)) {
+                    setBusinesses(documents);
+                }
             }
         });
     }, [searchParam]);
+
+    useEffect(() => {
+        let customMenuConfig = [
+            { label: 'Logout', handler: handleLogout }
+        ];
+
+        if (user.type === "business") {
+            customMenuConfig = [
+                { label: 'New', handler:  () => navigate('/business/new') },
+                ...customMenuConfig
+            ]
+        }
+
+        setCurrentMenuConfig(customMenuConfig);
+    },[businesses]);
 
     if (!loggedIn) {
         return <Navigate to='/' />;
@@ -36,23 +63,15 @@ const Dashboard = () => {
         }
     }
 
-    const businesses = responseData && responseData.documents;
-    const businessesSummary = businesses && businesses.map((business) => (
-        <div key={business._id} onClick={() => navigate(`/business/${business._id}`)}>{
-            Object.keys(business).map((key) => (
-                <p key={key}>{key}: {business[key]}</p>
-            ))}
-        </div>
-    ));
-
     return (
-        <>
-            <NavBar>
-                <NavMenu userType={user.type} page="Dashboard" />
-            </NavBar>
-            <h2>In the Dashboard</h2>
-            {businessesSummary}
-        </>
+        <div style={ { display: "flex", flexDirection: "row-reverse" } }>
+            <div style={ { display: "flex", flexDirection: "column", width: "60vw", padding: "40px", gap: "10px" } }>
+                {businesses.map((businessDetail) => <BusinessSummary key={businessDetail._id} businessDetail={businessDetail} onClickHandler={() => navigate(`/business/${businessDetail._id}`)}/>)}
+            </div>
+            <div style={ { display: "flex", flexDirection: "column", width: "40vw", padding: "40px" } }>
+                left
+            </div>
+        </div>
     );
 }
 

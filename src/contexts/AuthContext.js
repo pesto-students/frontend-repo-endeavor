@@ -15,7 +15,7 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const navigate = useNavigate();
-    const { setLoading } = useContext(AppContext);
+    const { setLoading, homeMenuConfig, setCurrentMenuConfig } = useContext(AppContext);
     const [loggedIn, setLoggedIn] = useState(isLocalStorageItemsExists());
     const [user, setUser] = useState(JSON.parse(localStorage.getItem('userProfile')));
     const { makeRequest } = useContext(ApiContext);
@@ -51,6 +51,7 @@ export const AuthProvider = ({ children }) => {
         // Update application state
         setUser(null);
         setLoggedIn(false);
+        setCurrentMenuConfig(homeMenuConfig);
 
         // Redirect to home or login page
         navigate('/');
