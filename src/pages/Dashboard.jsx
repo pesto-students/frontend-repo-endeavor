@@ -4,24 +4,23 @@ import { ApiContext } from '../contexts/ApiContext';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { AppContext } from '../contexts/AppContext';
 import BusinessSummary from '../components/BusinessSummary/BusinessSummary';
+import FilterPanel from '../components/FilterPanel';
+import LabelledBox from '../components/IO/LabelledBox';
+import { Rating } from '@mui/material';
 
 const Dashboard = () => {
     const { loggedIn, user, handleLogout } = useContext(AuthContext);
     const { makeRequest } = useContext(ApiContext);
     const { setCurrentMenuConfig } = useContext(AppContext);
     const navigate = useNavigate();
-    const initSearchParam = { 
+    const defaultSearchParam = { 
         page: 1, 
         limit: 10, 
-        filter: user.type === "consumer" ? 
-                    { city: user.city } : 
-                    user.type === "business" ? 
-                        { user_id: user.email } : 
-                        {}, 
+        filter: user.type === "consumer" ? { city: user.city, rating: { $gte: 0} } : { user_id: user.email, rating: { $gte: 0} },
         projection: { name: 1, service: 1, rating: 1 }, 
         sortBy: { updated_at: -1, created_at: -1 } 
     };
-    const [searchParam, setSearchParam] = useState(initSearchParam);
+    const [searchParam, setSearchParam] = useState(defaultSearchParam);
     const [businesses, setBusinesses] = useState([]);
 
     useEffect(() => {
@@ -69,7 +68,13 @@ const Dashboard = () => {
                 {businesses.map((businessDetail) => <BusinessSummary key={businessDetail._id} businessDetail={businessDetail} onClickHandler={() => navigate(`/business/${businessDetail._id}`)}/>)}
             </div>
             <div style={ { display: "flex", flexDirection: "column", width: "40vw", padding: "40px" } }>
-                left
+                <FilterPanel defaultSearchParam={defaultSearchParam} searchParam={searchParam} setSearchParam={setSearchParam} />
+                {
+                    user.type === "business" && 
+                    <LabelledBox label={user.name}>
+                        <Rating  value={user.rating} readOnly={true} />
+                    </LabelledBox>
+                }
             </div>
         </div>
     );

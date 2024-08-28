@@ -68,8 +68,23 @@ export const AuthProvider = ({ children }) => {
         }
     }, []);
 
+    const reloadUser = () => {
+        const fetchUrl = `${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/user/search/${user.email}`;
+        makeRequest({
+            url: fetchUrl,
+            method: 'POST',
+            customHandleRequestSuccess: (response) => {
+                let userProfile = response.data && response.data.userProfile;
+                if (userProfile) {
+                    localStorage.setItem('userProfile', JSON.stringify(userProfile));
+                    setUser(userProfile);
+                }
+            }
+        });
+    }
+
     return (
-        <AuthContext.Provider value={{ loggedIn, user, setUser, handleLogin, handleLoginSuccess, handleLogout }}>
+        <AuthContext.Provider value={{ loggedIn, user, setUser, handleLogin, handleLoginSuccess, handleLogout, reloadUser }}>
             {children}
         </AuthContext.Provider>
     );

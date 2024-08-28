@@ -7,26 +7,21 @@ import SelectOption from "../components/IO/SelectOption";
 import MultiValue from "../components/IO/MultiValue";
 import SingleValue from "../components/IO/SingleValue";
 import HorizontalImageList from "../components/IO/HorizontalImageList";
+import optionsCity from "../data/optionsCity.json"
+import optionsCategory from "../data/optionsCategory.json"
+import LabelledBox from "../components/IO/LabelledBox";
+import { RatingPanel } from "../components/RatingPanel";
+import { Rating } from "@mui/material";
 
 // pageType is one of the following : New, Update, View
 const BusinessDetail = () => {
     const { _id } = useParams();
-    const { loggedIn, user, handleLogout } = useContext(AuthContext);
+    const { loggedIn, user, handleLogout, reloadUser } = useContext(AuthContext);
     const pageType = !_id ? "New" : user.type === "business" ? "Update" : "View";
     const { makeRequest } = useContext(ApiContext);
     const { setCurrentMenuConfig } = useContext(AppContext);
     const [detailsAdded, setDetailsAdded] = useState(false);
     const [businessDetail, setBusinessDetail] = useState(null);
-    const optionsCity = [
-        { value: "delhi", label: "Delhi" },
-        { value: "mumbai", label: "Mumbai" },
-        { value: "kolkata", label: "Kolkata" },
-        // Add more options as needed
-    ];
-    const optionsCategory = [
-        { value: "automobile", label: "Automobile" },
-        { value: "electronics", label: "Electronics" },
-    ]
 
     const handleDeletion = async () => {
         const deleteUrl = `${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/business/delete/${_id}`;
@@ -34,6 +29,7 @@ const BusinessDetail = () => {
             url: deleteUrl,
             method: 'DELETE',
             customHandleRequestSuccess: (response) => {
+                reloadUser();
                 setDetailsAdded(true);
             }
         });
@@ -92,6 +88,37 @@ const BusinessDetail = () => {
         setBusinessDetail({ ...businessDetail, service: newStrings });
     };
 
+    const fetchBusinessDetail = () => {
+        const searchParam = { filter: { _id } };
+        const searchUrl = `${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/business/search`;
+        const searchMethod = 'POST';
+
+        makeRequest({
+            data: searchParam,
+            url: searchUrl,
+            method: searchMethod,
+            customHandleRequestSuccess: (response) => {
+                const business = response.data && response.data.documents[0];
+                if (business) {
+                    setBusinessDetail({
+                        user_id: business.user_id,
+                        city: business.city,
+                        category: business.category,
+                        name: business.name,
+                        owner: business.owner,
+                        email: business.email,
+                        mobile: business.mobile,
+                        service: business.service,
+                        address: business.address,
+                        logo: business.logo,
+                        gallery: business.gallery,
+                        rating: business.rating
+                    });
+                }
+            }
+        });
+    }
+
     useEffect(() => {
         if (!businessDetail) {
             if (pageType === "New") {
@@ -109,33 +136,7 @@ const BusinessDetail = () => {
                     gallery: []
                 });
             } else {
-                const searchParam = { filter: { _id } };
-                const searchUrl = `${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/business/search`;
-                const searchMethod = 'POST';
-
-                makeRequest({
-                    data: searchParam,
-                    url: searchUrl,
-                    method: searchMethod,
-                    customHandleRequestSuccess: (response) => {
-                        const business = response.data && response.data.documents[0];
-                        if (business) {
-                            setBusinessDetail({
-                                user_id: business.user_id,
-                                city: business.city,
-                                category: business.category,
-                                name: business.name,
-                                owner: business.owner,
-                                email: business.email,
-                                mobile: business.mobile,
-                                service: business.service,
-                                address: business.address,
-                                logo: business.logo,
-                                gallery: business.gallery
-                            });
-                        }
-                    }
-                });
+                fetchBusinessDetail();
             }
         }
     }, [businessDetail]);
@@ -179,8 +180,12 @@ const BusinessDetail = () => {
                     <MultiValue pageType={pageType} type="text" values={businessDetail.service} onValuesChange={handleStringsChange} label="Services" />
                 </div>
                 <div style={ { display: "flex", flexDirection: "column", width: "40vw", padding: "40px" } }>
+                    {pageType !== "New" && <LabelledBox label="Rating" >
+                        <Rating value={businessDetail.rating} readOnly={true} precision={0.5} />
+                    </LabelledBox>}
                     <HorizontalImageList pageType={pageType} isMultiple={false} onImageChange={handleLogoChange} onImagesChange={handleGalleryChange} image={businessDetail.logo} images={businessDetail.gallery} />
                     <HorizontalImageList pageType={pageType} isMultiple={true} onImageChange={handleLogoChange} onImagesChange={handleGalleryChange} image={businessDetail.logo} images={businessDetail.gallery} />
+                    {user.type === "consumer" && <RatingPanel user_id={user._id} business_id={_id} updateBusinessDetail={fetchBusinessDetail} />}
                 </div>
             </div>
         }

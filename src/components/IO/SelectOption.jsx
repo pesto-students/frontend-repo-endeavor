@@ -6,15 +6,16 @@ const SelectOption = ({ pageType, label, value, onChange, options }) => {
         return <SingleValue pageType={pageType} type="text" value={value} onChange={onChange} label={label} />;
     } else {
         return (
-            <FormControl required fullWidth>
+            <FormControl required={pageType !== "Search"} fullWidth>
                 <InputLabel id="demo-simple-select-required-label">{label}</InputLabel>
                 <Select
                     labelId="demo-simple-select-required-label"
                     id="demo-simple-select-required"
-                    value={value}
+                    value={!value ? "-- Default --" : value}
                     label={label}
                     onChange={onChange}
                 >
+                    <MenuItem value="-- Default --">-- Select --</MenuItem>
                     {options.map((option, index) => (
                         <MenuItem key={index} value={option.value}>
                             {option.label}
