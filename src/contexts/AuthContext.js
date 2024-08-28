@@ -69,7 +69,7 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const reloadUser = () => {
-        const fetchUrl = `${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/user/search/${user.email}`;
+        const fetchUrl = `${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/user/search/${user._id}`;
         makeRequest({
             url: fetchUrl,
             method: 'POST',
