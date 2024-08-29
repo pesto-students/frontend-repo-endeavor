@@ -99,6 +99,8 @@ const HorizontalImageList = ({ pageType, isMultiple, onImageChange, onImagesChan
                 onImageChange(singleImage);
             }
         }
+        // Reset the file input value to allow re-selection of the same file
+        e.target.value = '';
     }
 
     const getImageSrc = (image) => {

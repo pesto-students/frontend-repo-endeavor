@@ -166,7 +166,7 @@ const BusinessDetail = () => {
         }
 
         setCurrentMenuConfig(customMenuConfig);
-    },[businessDetail]);
+    },[businessDetail, isFormFilled]);
 
     useEffect(() => {
         if (user.type === "consumer") {
@@ -221,8 +221,8 @@ const BusinessDetail = () => {
                     {pageType !== "New" && <LabelledBox label="Rating" >
                         <Rating value={businessDetail.rating} readOnly={true} precision={0.5} />
                     </LabelledBox>}
-                    <HorizontalImageList pageType={pageType} isMultiple={false} onImageChange={handleLogoChange} onImagesChange={handleGalleryChange} image={businessDetail.logo} images={businessDetail.gallery} />
-                    <HorizontalImageList pageType={pageType} isMultiple={true} onImageChange={handleLogoChange} onImagesChange={handleGalleryChange} image={businessDetail.logo} images={businessDetail.gallery} />
+                    <HorizontalImageList pageType={pageType} isMultiple={false} onImageChange={handleLogoChange} image={businessDetail.logo} />
+                    <HorizontalImageList pageType={pageType} isMultiple={true} onImagesChange={handleGalleryChange} images={businessDetail.gallery} />
                     {user.type === "consumer" && <RatingPanel user_id={user._id} business_id={_id} updateBusinessDetail={fetchBusinessDetail} />}
                 </div>
             </div>
