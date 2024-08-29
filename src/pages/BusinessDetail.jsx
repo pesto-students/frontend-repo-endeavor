@@ -22,6 +22,8 @@ const BusinessDetail = () => {
     const { setCurrentMenuConfig } = useContext(AppContext);
     const [detailsAdded, setDetailsAdded] = useState(false);
     const [businessDetail, setBusinessDetail] = useState(null);
+    const [isFormFilled, setIsFormFilled] = useState(user.type ===  "consumer" ? true : false);
+    const [errors, setErrors] = useState({});
 
     const handleDeletion = async () => {
         const deleteUrl = `${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/business/delete/${_id}`;
@@ -36,6 +38,10 @@ const BusinessDetail = () => {
     }
 
     const handleFormSubmission = async () => {
+        if (!isFormFilled) {
+            return;
+        }
+        
         const createUrl = `${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/business/new`;
         const createMethod = 'POST';
         const createContentType = 'multipart/form-data';
@@ -162,6 +168,37 @@ const BusinessDetail = () => {
         setCurrentMenuConfig(customMenuConfig);
     },[businessDetail]);
 
+    useEffect(() => {
+        if (user.type === "consumer") {
+            return;
+        }
+
+        let formFilled = true;
+
+        if (businessDetail &&
+            (!businessDetail.city || businessDetail.city === "-- Default --" ||
+                !businessDetail.category || businessDetail.category === "-- Default --" ||
+                !businessDetail.service.length ||
+                !businessDetail.logo ||
+                !businessDetail.gallery.length)) {
+            formFilled = false;
+        }
+
+        const allFalse = Object.values(errors).every(value => value === false);
+
+        if (!allFalse) {
+            formFilled = false;
+        }
+
+        if (pageType === "New") {
+            if (Object.keys(errors).length < 3) {
+                formFilled = false;
+            }
+        }
+
+        if (isFormFilled != formFilled) setIsFormFilled(formFilled);
+    }, [businessDetail]);
+
     if (detailsAdded) {
         return <Navigate to='/dashboard' />;
     }
@@ -172,12 +209,13 @@ const BusinessDetail = () => {
                 <div style={ { display: "flex", flexDirection: "column", width: "60vw", padding: "40px", gap: "10px" } }>
                     <SelectOption pageType={pageType} label="City" value={businessDetail.city} onChange={(e) => setBusinessDetail({ ...businessDetail, city: e.target.value })} options={optionsCity} />
                     <SelectOption pageType={pageType} label="Category" value={businessDetail.category} onChange={(e) => setBusinessDetail({ ...businessDetail, category: e.target.value })} options={optionsCategory} />
-                    <SingleValue pageType={pageType} type="text" value={businessDetail.name} onChange={(e) => setBusinessDetail({ ...businessDetail, name: e.target.value })} label="Business Name" />
-                    <SingleValue pageType={pageType} type="text" value={businessDetail.owner} onChange={(e) => setBusinessDetail({ ...businessDetail, owner: e.target.value })} label="Owner Name" />
-                    <SingleValue pageType={pageType} type="text" value={businessDetail.email} onChange={(e) => setBusinessDetail({ ...businessDetail, email: e.target.value })} label="Email" />
-                    <SingleValue pageType={pageType} type="number" value={businessDetail.mobile} onChange={(e) => setBusinessDetail({ ...businessDetail, mobile: e.target.value })} label="Mobile" />
-                    <SingleValue pageType={pageType} type="text" value={businessDetail.address} onChange={(e) => setBusinessDetail({ ...businessDetail, address: e.target.value })} label="Address" />
+                    <SingleValue pageType={pageType} type="text" value={businessDetail.name} onChange={(e) => setBusinessDetail({ ...businessDetail, name: e.target.value })} label="Business Name" errors={errors} errorKey="name" setErrors={setErrors} />
+                    <SingleValue pageType={pageType} type="text" value={businessDetail.owner} onChange={(e) => setBusinessDetail({ ...businessDetail, owner: e.target.value })} label="Owner Name" errors={errors} errorKey="owner" setErrors={setErrors} />
+                    <SingleValue pageType={pageType} type="email" value={businessDetail.email} onChange={(e) => setBusinessDetail({ ...businessDetail, email: e.target.value })} label="Email" errors={errors} errorKey="email" setErrors={setErrors} />
+                    <SingleValue pageType={pageType} type="number" value={businessDetail.mobile} onChange={(e) => setBusinessDetail({ ...businessDetail, mobile: e.target.value })} label="Mobile" isMobile={true} errors={errors} errorKey="mobile" setErrors={setErrors} />
+                    <SingleValue pageType={pageType} type="text" value={businessDetail.address} onChange={(e) => setBusinessDetail({ ...businessDetail, address: e.target.value })} label="Address" errors={errors} errorKey="address" setErrors={setErrors} />
                     <MultiValue pageType={pageType} type="text" values={businessDetail.service} onValuesChange={handleStringsChange} label="Services" />
+                    {!isFormFilled && "Fill all the required details..."}
                 </div>
                 <div style={ { display: "flex", flexDirection: "column", width: "40vw", padding: "40px" } }>
                     {pageType !== "New" && <LabelledBox label="Rating" >
