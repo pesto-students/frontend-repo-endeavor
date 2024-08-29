@@ -59,6 +59,7 @@ const SingleValue = ({ pageType, type, value, onChange, label, minLength, maxLen
         InputProps={{
             readOnly: pageType === "View",
         }}
+        fullWidth
     />
 }
 

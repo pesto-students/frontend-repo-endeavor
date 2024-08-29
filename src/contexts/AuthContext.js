@@ -76,15 +76,19 @@ export const AuthProvider = ({ children }) => {
             customHandleRequestSuccess: (response) => {
                 let userProfile = response.data && response.data.userProfile;
                 if (userProfile) {
-                    localStorage.setItem('userProfile', JSON.stringify(userProfile));
-                    setUser(userProfile);
+                    updateUser(userProfile);
                 }
             }
         });
     }
 
+    const updateUser = (userProfile) => {
+        localStorage.setItem('userProfile', JSON.stringify(userProfile));
+        setUser(userProfile);
+    }
+
     return (
-        <AuthContext.Provider value={{ loggedIn, user, setUser, handleLogin, handleLoginSuccess, handleLogout, reloadUser }}>
+        <AuthContext.Provider value={{ loggedIn, user, setUser, handleLogin, handleLoginSuccess, handleLogout, reloadUser, updateUser }}>
             {children}
         </AuthContext.Provider>
     );
