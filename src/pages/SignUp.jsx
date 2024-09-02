@@ -10,9 +10,9 @@ import optionsType from "../data/optionsType.json"
 import { AppContext } from '../contexts/AppContext';
 
 const SignUp = () => {
-    const { loggedIn, user, updateUser } = useContext(AuthContext);
+    const { loggedIn, user, setCurrentMenuConfig } = useContext(AppContext);
     const { makeRequest } = useContext(ApiContext);
-    const { setCurrentMenuConfig } = useContext(AppContext);
+    const { updateUser } = useContext(AuthContext);
     const [userProfile, setUserProfile] = useState({
         email: user.email,
         mobile: user.mobile,

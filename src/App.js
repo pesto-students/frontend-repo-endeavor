@@ -1,18 +1,24 @@
+import {  BrowserRouter as Router } from 'react-router-dom';
 import './App.css';
 import NavBar from './components/NavBar/NavBar';
-import { ApiProvider } from './contexts/ApiContext';
 import { AppProvider } from './contexts/AppContext';
 import AppRoutes from './routes/AppRoutes';
+import { ApiProvider } from './contexts/ApiContext';
+import { AuthProvider } from './contexts/AuthContext';
 
 
 function App() {
   return (
-    <AppProvider>
-      <ApiProvider>
-        <NavBar />
-        <AppRoutes />
-      </ApiProvider>
-    </AppProvider>
+    <Router>
+      <AppProvider>
+        <ApiProvider>
+          <AuthProvider>
+            <NavBar />
+            <AppRoutes />
+          </AuthProvider>
+        </ApiProvider>
+      </AppProvider>
+    </Router>
   );
 }
 

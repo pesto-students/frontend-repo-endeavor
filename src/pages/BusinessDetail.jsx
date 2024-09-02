@@ -15,11 +15,11 @@ import { Rating } from "@mui/material";
 
 // pageType is one of the following : New, Update, View
 const BusinessDetail = () => {
-    const { _id } = useParams();
-    const { loggedIn, user, handleLogout, reloadUser } = useContext(AuthContext);
-    const pageType = !_id ? "New" : user.type === "business" ? "Update" : "View";
+    const { user, setCurrentMenuConfig } = useContext(AppContext);
+    const { handleLogout, reloadUser } = useContext(AuthContext);
     const { makeRequest } = useContext(ApiContext);
-    const { setCurrentMenuConfig } = useContext(AppContext);
+    const { _id } = useParams();
+    const pageType = !_id ? "New" : user.type === "business" ? "Update" : "View";
     const [detailsAdded, setDetailsAdded] = useState(false);
     const [businessDetail, setBusinessDetail] = useState(null);
     const [isFormFilled, setIsFormFilled] = useState(user.type ===  "consumer" ? true : false);

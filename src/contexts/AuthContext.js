@@ -1,31 +1,18 @@
-import { createContext, useState, useEffect, useContext } from 'react';
+import { createContext, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppContext } from './AppContext';
 import { ApiContext } from './ApiContext';
-
-const isLocalStorageItemsExists = () => {
-    const authToken = localStorage.getItem('authToken');
-    const userProfile = localStorage.getItem('userProfile');
-
-    // Return true if both authToken and userProfile are present, false otherwise
-    return authToken !== null && userProfile !== null;
-};
+import { isLocalStorageItemsExists } from '../components/utils/localStorage';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const navigate = useNavigate();
-    const { setLoading, homeMenuConfig, setCurrentMenuConfig } = useContext(AppContext);
-    const [loggedIn, setLoggedIn] = useState(isLocalStorageItemsExists());
-    const [user, setUser] = useState(JSON.parse(localStorage.getItem('userProfile')));
+    const { setLoading, loggedIn, setLoggedIn, user, setUser, clearAuthDataAndRedirect } = useContext(AppContext);
     const { makeRequest } = useContext(ApiContext);
-    const logoutUrl = `${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/auth/logout`;
-    const logoutMethod = 'POST';
 
-
-    const handleLoginSuccess = (authToken, userProfile) => {
-        // Store token and user data in localStorage
-        localStorage.setItem('authToken', authToken);
+    const handleLoginSuccess = (userProfile) => {
+        // Store user data in localStorage
         localStorage.setItem('userProfile', JSON.stringify(userProfile));
 
         // Update application state
@@ -44,25 +31,22 @@ export const AuthProvider = ({ children }) => {
     };
 
     const handleLogoutSuccess = (response) => {
-        // Remove token and user data in localStorage
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('userProfile');
-
-        // Update application state
-        setUser(null);
-        setLoggedIn(false);
-        setCurrentMenuConfig(homeMenuConfig);
-
         // Redirect to home or login page
-        navigate('/');
+        clearAuthDataAndRedirect();
     }
 
     const handleLogout = async () => {
-        makeRequest({ url: logoutUrl, method: logoutMethod, customHandleRequestSuccess: handleLogoutSuccess });
+        const logoutUrl = `${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/auth/logout`;
+        const logoutMethod = 'POST';
+        makeRequest({ 
+            url: logoutUrl, 
+            method: logoutMethod,
+            customHandleRequestSuccess: handleLogoutSuccess 
+        });
     }
 
     useEffect(() => {
-        // Logout if the user is logged in and authToken or userProfile information is tempered
+        // Logout if the user is logged in and localStorage information is tempered
         if (loggedIn && !isLocalStorageItemsExists()) {
             handleLogoutSuccess();
         }
@@ -88,7 +72,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     return (
-        <AuthContext.Provider value={{ loggedIn, user, setUser, handleLogin, handleLoginSuccess, handleLogout, reloadUser, updateUser }}>
+        <AuthContext.Provider value={{ handleLogin, handleLoginSuccess, handleLogout, reloadUser, updateUser }}>
             {children}
         </AuthContext.Provider>
     );

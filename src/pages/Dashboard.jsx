@@ -9,9 +9,9 @@ import LabelledBox from '../components/IO/LabelledBox';
 import { Rating } from '@mui/material';
 
 const Dashboard = () => {
-    const { loggedIn, user, handleLogout } = useContext(AuthContext);
+    const { loggedIn, user, setCurrentMenuConfig } = useContext(AppContext);
     const { makeRequest } = useContext(ApiContext);
-    const { setCurrentMenuConfig } = useContext(AppContext);
+    const { handleLogout } = useContext(AuthContext);
     const navigate = useNavigate();
     const defaultSearchParam = { 
         page: 1, 

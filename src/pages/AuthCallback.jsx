@@ -7,11 +7,10 @@ const AuthCallback = () => {
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    const authToken = searchParams.get('token');
-    const userProfile = JSON.parse(decodeURIComponent(searchParams.get('user')));
+    const userProfile = JSON.parse(decodeURIComponent(searchParams.get('userProfile')));
 
-    if (authToken && userProfile) {
-      handleLoginSuccess(authToken, userProfile);
+    if (userProfile) {
+      handleLoginSuccess(userProfile);
     }
   }, [searchParams, handleLoginSuccess]);
 
