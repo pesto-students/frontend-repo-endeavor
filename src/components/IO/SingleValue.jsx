@@ -5,6 +5,9 @@ const SingleValue = ({ pageType, type, value, onChange, label, minLength, maxLen
     const [errorMessage, setErrorMessage] = useState('');
 
     const handleChange = (event) => {
+        if (pageType === "View") {
+            return;
+        }
         const newValue = event.target.value;
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const phoneRegex = new RegExp(`^[1-9][0-9]{${mobileLength-1}}$`);

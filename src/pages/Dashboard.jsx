@@ -16,7 +16,7 @@ const Dashboard = () => {
     const defaultSearchParam = { 
         page: 1, 
         limit: 10, 
-        filter: user.type === "consumer" ? { city: user.city, rating: { $gte: 0} } : { user_id: user.email, rating: { $gte: 0} },
+        filter: user.type === "consumer" ? { city: user.city, rating: { $gte: 0} } : { user_id: user._id, rating: { $gte: 0} },
         projection: { name: 1, service: 1, rating: 1 }, 
         sortBy: { updated_at: -1, created_at: -1 } 
     };
@@ -72,7 +72,7 @@ const Dashboard = () => {
                 {
                     user.type === "business" && 
                     <LabelledBox label={user.name}>
-                        <Rating  value={user.rating} readOnly={true} />
+                        <Rating  value={user.rating} precision={0.5} readOnly={true} />
                     </LabelledBox>
                 }
             </div>

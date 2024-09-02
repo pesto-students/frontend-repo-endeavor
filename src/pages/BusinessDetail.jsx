@@ -129,7 +129,7 @@ const BusinessDetail = () => {
         if (!businessDetail) {
             if (pageType === "New") {
                 setBusinessDetail({
-                    user_id: user.email,
+                    user_id: user._id,
                     city: user.city,
                     category: null,
                     name: null,

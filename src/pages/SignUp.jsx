@@ -14,7 +14,6 @@ const SignUp = () => {
     const { makeRequest } = useContext(ApiContext);
     const { updateUser } = useContext(AuthContext);
     const [userProfile, setUserProfile] = useState({
-        email: user.email,
         mobile: user.mobile,
         city: user.city,
         type: user.type
@@ -30,7 +29,7 @@ const SignUp = () => {
             return;
         }
 
-        const updateUrl = `${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/user/update`;
+        const updateUrl = `${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/user/update/${user._id}`;
         const updateMethod = 'PATCH';
         makeRequest({
             data: userProfile,
