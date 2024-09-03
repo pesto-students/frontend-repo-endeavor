@@ -2,7 +2,7 @@ import { createContext, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppContext } from './AppContext';
 import { ApiContext } from './ApiContext';
-import { isLocalStorageItemsExists } from '../components/utils/localStorage';
+import { isLocalStorageItemsExists } from '../utils/localStorage';
 
 export const AuthContext = createContext();
 

@@ -1,7 +1,7 @@
 import React, { createContext, useEffect, useState } from 'react';
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import { lightTheme, darkTheme } from '../theme/theme';
-import { isLocalStorageItemsExists } from '../components/utils/localStorage';
+import { isLocalStorageItemsExists } from '../utils/localStorage';
 import { useNavigate } from 'react-router-dom';
 
 // Create a context with an initial state
