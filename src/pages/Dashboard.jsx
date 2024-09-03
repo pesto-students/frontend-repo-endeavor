@@ -24,19 +24,21 @@ const Dashboard = () => {
     const [businesses, setBusinesses] = useState([]);
 
     useEffect(() => {
-        const searchUrl = `${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/business/search`;
-        const searchMethod = 'POST';
-        makeRequest({ 
-            data: searchParam, 
-            url: searchUrl, 
-            method: searchMethod, 
-            customHandleRequestSuccess: (response) => {
-                const documents = response.data && response.data.documents;
-                if (Array.isArray(documents)) {
-                    setBusinesses(documents);
+        if (user.type) {
+            const searchUrl = `${process.env.REACT_APP_BACKEND_DOMAIN}/api/v1/business/search`;
+            const searchMethod = 'POST';
+            makeRequest({ 
+                data: searchParam, 
+                url: searchUrl, 
+                method: searchMethod, 
+                customHandleRequestSuccess: (response) => {
+                    const documents = response.data && response.data.documents;
+                    if (Array.isArray(documents)) {
+                        setBusinesses(documents);
+                    }
                 }
-            }
-        });
+            });
+        }
     }, [searchParam]);
 
     useEffect(() => {
