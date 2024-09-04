@@ -14,7 +14,13 @@ export const ApiProvider = ({ children }) => {
             url: refreshTokenUrl, 
             method: refreshTokenMethod,
             refreshToken: false,
-            "customHandleRequestSuccess": customHandleRequestSuccess
+            "customHandleRequestSuccess": (response) => {
+                if (process.env.REACT_APP_AUTH_TOKEN_STORAGE === "localstorage") {
+                    if (response.data && response.data.accessToken) localStorage.setItem('accessToken', response.data.accessToken);
+                    if (response.data && response.data.refreshToken) localStorage.setItem('refreshToken', response.data.refreshToken);
+                }
+                customHandleRequestSuccess(response);
+            }
         });
     }
 
@@ -33,15 +39,25 @@ export const ApiProvider = ({ children }) => {
             setLoading(true);
         }
 
+        const headers = {
+            'Content-Type': contentType
+        }
+
+        if (process.env.REACT_APP_AUTH_TOKEN_STORAGE === "localstorage") {
+            const accessToken = localStorage.getItem('accessToken'); // Get the access token from localStorage (or from another secure place)
+            const refreshToken = localStorage.getItem('refreshToken'); // Get the refresh token
+
+            if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
+            if (refreshToken) headers['refresh-token'] = refreshToken;
+        }
+
         try {
             const response = await axios({
                 url,
                 method,
                 data: method !== 'GET' ? data : undefined,
-                headers: {
-                    'Content-Type': contentType
-                },
-                withCredentials: true,
+                headers: headers,
+                withCredentials: process.env.REACT_APP_AUTH_TOKEN_STORAGE !== "localstorage",
                 validateStatus: (status) => {
                     if (
                         status === 200 || status === 201 ||

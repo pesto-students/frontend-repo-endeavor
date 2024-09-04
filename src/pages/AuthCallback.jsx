@@ -7,11 +7,15 @@ const AuthCallback = () => {
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
+    let accessToken = null;
+    let refreshToken = null;
+    if (process.env.REACT_APP_AUTH_TOKEN_STORAGE === "localstorage") {
+      accessToken = searchParams.get('accessToken');
+      refreshToken = searchParams.get('refreshToken');
+    }
     const userProfile = JSON.parse(decodeURIComponent(searchParams.get('userProfile')));
 
-    if (userProfile) {
-      handleLoginSuccess(userProfile);
-    }
+    handleLoginSuccess(accessToken, refreshToken, userProfile);
   }, [searchParams, handleLoginSuccess]);
 
   return <div>Loading...</div>;

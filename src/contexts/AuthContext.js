@@ -11,8 +11,12 @@ export const AuthProvider = ({ children }) => {
     const { setLoading, loggedIn, setLoggedIn, user, setUser, clearAuthDataAndRedirect } = useContext(AppContext);
     const { makeRequest } = useContext(ApiContext);
 
-    const handleLoginSuccess = (userProfile) => {
+    const handleLoginSuccess = (accessToken, refreshToken, userProfile) => {
         // Store user data in localStorage
+        if (process.env.REACT_APP_AUTH_TOKEN_STORAGE === "localstorage") {
+            localStorage.setItem('accessToken', accessToken);
+            localStorage.setItem('refreshToken', refreshToken);
+        }
         localStorage.setItem('userProfile', JSON.stringify(userProfile));
 
         // Update application state
