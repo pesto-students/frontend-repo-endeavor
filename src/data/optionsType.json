@@ -1,0 +1,4 @@
+[
+    { "value": "consumer", "label": "Consumer" },
+    { "value": "business", "label": "Business" }
+]
